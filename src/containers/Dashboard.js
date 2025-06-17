@@ -1,6 +1,6 @@
 import { formatDate } from "../app/format.js";
 import DashboardFormUI from "../views/DashboardFormUI.js";
-import BigBilledIcon from "../assets/svg/big_billed.js";Add commentMore actions
+import BigBilledIcon from "../assets/svg/big_billed.js";
 import { ROUTES_PATH } from "../constants/routes.js";
 import USERS_TEST from "../constants/usersTest.js";
 import Logout from "./Logout.js";
@@ -43,7 +43,13 @@ export const card = (bill) => {
       <div class='bill-card-name-container'>
         <div class='bill-card-name'> ${firstName} ${lastName} </div>
         <span class='bill-card-grey'> ... </span>
-@@ -49,140 +53,135 @@ export const card = (bill) => {
+      </div>
+      <div class='name-price-container'>
+        <span> ${bill.name} </span>
+        <span> ${bill.amount} € </span>
+      </div>
+      <div class='date-type-container'>
+        <span> ${formatDate(bill.date)} </span>
         <span> ${bill.type} </span>
       </div>
     </div>
@@ -89,14 +95,26 @@ export default class {
 	};
 
 	handleEditTicket(e, bill, bills) {
-		e.preventDefault();
-		bills.forEach((b) => {
-			$(`#open-bill${b.id}`).css({ background: "#0D5AE5" });
-		});
-		$(`#open-bill${bill.id}`).css({ background: "#2A2B35" });
-		$(".dashboard-right-container div").html(DashboardFormUI(bill));
-		$(".vertical-navbar").css({ height: "150vh" });
+		e.stopImmediatePropagation();
+		if (this.counter === undefined || this.id !== bill.id) this.counter = 0;
+		if (this.id === undefined || this.id !== bill.id) this.id = bill.id;
+		if (this.counter % 2 === 0) {
+			bills.forEach((b) => {
+				$(`#open-bill${b.id}`).css({ background: "#0D5AE5" });
+			});
+			$(`#open-bill${bill.id}`).css({ background: "#2A2B35" });
+			$(".dashboard-right-container div").html(DashboardFormUI(bill));
+			$(".vertical-navbar").css({ height: "150vh" });
+			this.counter++;
+		} else {
+			$(`#open-bill${bill.id}`).css({ background: "#0D5AE5" });
 
+			$(".dashboard-right-container div").html(`
+        <div id="big-billed-icon" data-testid="big-billed-icon"> ${BigBilledIcon} </div>
+      `);
+			$(".vertical-navbar").css({ height: "120vh" });
+			this.counter++;
+		}
 		$("#icon-eye-d").click(this.handleClickIconEye);
 		$("#btn-accept-bill").click((e) => this.handleAcceptSubmit(e, bill));
 		$("#btn-refuse-bill").click((e) => this.handleRefuseSubmit(e, bill));
@@ -123,7 +141,6 @@ export default class {
 	};
 
 	handleShowTickets(e, bills, index) {
-		e.preventDefault();
 		if (this.counter === undefined || this.index !== index) this.counter = 0;
 		if (this.index === undefined || this.index !== index) this.index = index;
 		if (this.counter % 2 === 0) {
@@ -178,9 +195,4 @@ export default class {
 				.catch(console.log);
 		}
 	};
-
-
-
-
-
 }
